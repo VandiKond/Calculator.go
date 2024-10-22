@@ -37,5 +37,5 @@ func Calc(expression string) (float64, error) {
 	return return_float, nil
 }
 func main() {
-	Calc("abcdefghigklmnop")
+	Calc("()")
 }
