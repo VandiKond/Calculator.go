@@ -109,18 +109,28 @@ func OrderOperations(expression string) (string, error) {
 	// Заменяем выполненую операцию
 	expression = strings.Replace(expression, oper.FormatToString(), strconv.FormatFloat(result, 'f', -1, 64), 1)
 
+	// Проверяем является ли результат числом
 	_, ok := strconv.ParseFloat(expression, 64)
 	if ok != nil {
+		// В случае если результат не число, то продолжаем операцию
 		expression, err = OrderOperations(expression)
 		if err != nil {
 			return expression, err
 		}
 	}
+
+	// Возвращаем результат операции
 	return expression, nil
 }
 
 // Функция для приоретезации порядка в выражение без скобок
 func ManageOrder(expression string) (string, error) {
+	// Проверяем не является ли выражение просто числом
+	_, err := strconv.ParseFloat(expression, 64)
+	if err == nil {
+		return expression, err
+	}
+
 	// Полуаем индекс умножение и делания
 	indexMul := strings.Index(expression, "*")
 	indexDiv := strings.Index(expression, "/")
@@ -173,18 +183,28 @@ func ManageOrder(expression string) (string, error) {
 
 	// Создаем операцию
 	oper := Operation{num1: num1, symvol: operatType, num2: num2}
+
+	// Выполнение операции. в случае ошибки возвращаем ее
 	result, err := oper.ParaseOper()
 	if err != nil {
 		return expression, err
 	}
+
+	// Заменяем выполненую операцию
 	expression = strings.Replace(expression, oper.FormatToString(), strconv.FormatFloat(result, 'f', -1, 64), 1)
+
+	// Проверяем является ли результат числом
 	_, ok := strconv.ParseFloat(expression, 64)
 	if ok != nil {
+
+		// В случае если результат не число, то продолжаем операцию
 		expression, err = ManageOrder(expression)
 		if err != nil {
 			return expression, err
 		}
 	}
+
+	// Возвращаем результат операции
 	return expression, nil
 }
 
@@ -212,7 +232,7 @@ func BraketOf(expression string) (string, error) {
 				return "", err
 			}
 			// Заменяем выражение на исход примера и возвращаем оставшееся выражение
-			expression = strings.Replace(expression, expression[:indexClose+1], managedexeption, -1)
+			expression = strings.Replace(expression, expression[:indexClose+1], managedexeption, 1)
 			return expression, nil
 		}
 
@@ -223,7 +243,7 @@ func BraketOf(expression string) (string, error) {
 		}
 
 		// Заменяем строку на результат убиранее скобок и идем по циклу дальше
-		expression = strings.Replace(expression, expression[indexOpen:], BreketOfEx, -1)
+		expression = strings.Replace(expression, expression[indexOpen:], BreketOfEx, 1)
 		indexOpen = strings.Index(expression, "(")
 		indexClose = strings.Index(expression, ")")
 	}
@@ -251,6 +271,7 @@ func Calc(expression string) (float64, error) {
 			return float64(0), err
 		}
 	}
+
 	// Выполняем операцию с оставшийся строкой без скобок. В случае ошибки возврщаем ошибку
 	expression, err = ManageOrder(expression)
 	if err != nil {
