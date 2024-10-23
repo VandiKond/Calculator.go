@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 )
 
 // Все разрешенные операторы
@@ -22,8 +21,6 @@ type Operation struct {
 
 // Метод для выполнения операции
 func (Op Operation) ParaseOper() (float64, error) {
-	time.Sleep(time.Second)
-	fmt.Println("Doing operation : ", Op)
 	// Предваритеьно создаем конечное число
 	var num float64
 	// Проходимся по символам
@@ -49,7 +46,6 @@ func (Op Operation) ParaseOper() (float64, error) {
 	default:
 		return float64(0), fmt.Errorf("400 Неизвестный знак : %s", Op.symvol)
 	}
-	fmt.Println("Result :", num)
 	// Возвращаем результат
 	return num, nil
 }
