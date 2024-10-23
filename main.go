@@ -259,9 +259,3 @@ func Calc(expression string) (float64, error) {
 
 	return strconv.ParseFloat(expression, 64)
 }
-
-func main() {
-	fmt.Println(Calc("(1 + 2) * 3 / 4"))
-
-	// fmt.Println(Calc("1+(1+(1+1)*2)* (1+2 * (7*(7*8) + 8 + 9) - (9 / 3 * (8/2) + (8 * 9))"))
-}
