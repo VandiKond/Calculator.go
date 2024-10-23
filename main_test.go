@@ -8,7 +8,7 @@ func TestCalc(t *testing.T) {
 		expression string
 		expected   float64
 	}{
-		{"(1 + 2) * 3 / 4", 2.25}
+		{"(1 + 2) * 3 / 4", 2.25},
 	}
 
 	for _, testCase := range testCases {
