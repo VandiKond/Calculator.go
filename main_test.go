@@ -25,6 +25,8 @@ func TestCalc(t *testing.T) {
 		{"-1+2", 1},
 		{"5+ -1", 4},
 		{"5+ -5 + 7 - -6", 13},
+		{"-(5+5)", -10},
+		{"-90+90", 0},
 	}
 
 	for _, testCase := range testCases {
