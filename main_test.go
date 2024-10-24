@@ -22,15 +22,18 @@ func TestCalc(t *testing.T) {
 		{"(1)", 1},
 		{"(1+2*(10) + 10)", 31},
 		{"((1+2)*(5*(7+3) - 70 / (3+4) * (1+2)) - (8-1)) + (10 * (5-1 * (2+3)))", 53},
+		{"-1+2", 1},
+		{"5+ -1", 4},
+		{"5+ -5 + 7 - -6", 13},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.expression, func(t *testing.T) {
 			result, err := Calc(testCase.expression)
 			if err != nil {
-				t.Errorf("Calc(%s) error: %v", testCase.expression, err)
+				t.Errorf("Calc(%s) ошибка: %v", testCase.expression, err)
 			} else if result != testCase.expected {
-				t.Errorf("Calc(%s) = %v, want %v", testCase.expression, result, testCase.expected)
+				t.Errorf("Calc(%s) = %v, ждет %v", testCase.expression, result, testCase.expected)
 			}
 		})
 	}

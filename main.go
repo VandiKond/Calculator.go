@@ -38,13 +38,13 @@ func (Op Operation) ParseOper() (float64, error) {
 	// В случае деления проверяем второе число на то, что оно 0. Если нет то возвращаем результат деления
 	case "/":
 		if Op.num2 == 0 {
-			return 0, fmt.Errorf("400 Делить на 0 нельзя!")
+			return 0, fmt.Errorf("Делить на 0 нельзя")
 		}
 		num = Op.num1 / Op.num2
 		break
 	// В ином случае вызываем ошибку
 	default:
-		return 0, fmt.Errorf("400 Неизвестный знак : %s", Op.symvol)
+		return 0, fmt.Errorf("400 Неизвестный знак : [%s]", Op.symvol)
 	}
 	// Возвращаем результат
 	return num, nil
@@ -63,16 +63,27 @@ func findIndex(str string, findType func(int, int) bool, stand_result int, getIn
 	var operatorResult string
 	// Проходимся по операциям
 	for _, operator := range operators {
-		// Получаем и проверяем индекс по условию
-
+		// Получаем индекс
 		index := getIndex(str, operator)
+
+		// Проверяем существование индекса
 		if index == -1 {
 			continue
 		}
+
+		// Проверка на унарный минус
+		if operator == "-" && index == 0 {
+			// Получаем слудуйщий оператор после -
+			index, operator = findIndex(str[1:], findType, stand_result, getIndex)
+			index++
+		}
+
+		// Проверяем индекс по условию и в случае успеха задаем данными переменных результатами
 		if findType(index, ResultIndex) {
 			ResultIndex = index
 			operatorResult = operator
 		}
+
 	}
 
 	// Возвращаем индекс
@@ -87,7 +98,7 @@ func OrderOperations(expression string) (string, error) {
 	// Конвертируем в число все что до оператора. В случае ошибки возвращаем ее
 	num1, err := strconv.ParseFloat(expression[:index], 64)
 	if err != nil {
-		return expression, err
+		return expression, fmt.Errorf("Ошибка обработки: [%s] не является числом", expression[:index])
 	}
 
 	// Получаем индекс второго оператор. Конвертируем в число его. В случае ошибки возвращаем ее
@@ -95,7 +106,7 @@ func OrderOperations(expression string) (string, error) {
 	indexOfEnd, _ := findIndex(expressionTilEnd, func(i1, i2 int) bool { return i1 < i2 }, len(expressionTilEnd), strings.Index)
 	num2, err := strconv.ParseFloat(expressionTilEnd[:indexOfEnd], 64)
 	if err != nil {
-		return expression, err
+		return expression, fmt.Errorf("Ошибка обработки: [%s] не является числом", expressionTilEnd[:indexOfEnd])
 	}
 
 	// СОздаем данные об операции
@@ -104,7 +115,7 @@ func OrderOperations(expression string) (string, error) {
 	// Выполняем операцию. в случае ошибки возвращаем ее
 	result, err := oper.ParseOper()
 	if err != nil {
-		return expression, err
+		return expression, fmt.Errorf("Ошибка выполнения примера [%s]: %v", oper.FormatToString(), err)
 	}
 	// Заменяем выполненую операцию
 	expression = strings.Replace(expression, oper.FormatToString(), strconv.FormatFloat(result, 'f', -1, 64), 1)
@@ -115,7 +126,7 @@ func OrderOperations(expression string) (string, error) {
 		// В случае если результат не число, то продолжаем операцию
 		expression, err = OrderOperations(expression)
 		if err != nil {
-			return expression, err
+			return expression, fmt.Errorf("Ошибка обработки: [%s] не является числом", expression)
 		}
 	}
 
@@ -128,7 +139,7 @@ func ManageOrder(expression string) (string, error) {
 	// Проверяем не является ли выражение просто числом
 	_, err := strconv.ParseFloat(expression, 64)
 	if err == nil {
-		return expression, err
+		return expression, nil
 	}
 
 	// Полуаем индекс умножение и делания
@@ -147,7 +158,7 @@ func ManageOrder(expression string) (string, error) {
 	if indexDiv == indexMul {
 		expression, err := OrderOperations(expression)
 		if err != nil {
-			return expression, err
+			return expression, fmt.Errorf("Ошибка последовательной операции [%s]: %v", expression, err)
 		}
 		return expression, nil
 	}
@@ -176,9 +187,10 @@ func ManageOrder(expression string) (string, error) {
 	num1, err1 := strconv.ParseFloat(expressionBe4[indexBe4+1:], 64)
 	num2, err2 := strconv.ParseFloat(expressionAfter[:indexAfter], 64)
 	if err1 != nil {
-		return expression, err1
-	} else if err2 != nil {
-		return expression, err2
+		return expression, fmt.Errorf("Ошибка обработки: [%s] не является числом", expressionBe4[indexBe4+1:])
+	}
+	if err2 != nil {
+		return expression, fmt.Errorf("Ошибка обработки: [%s] не является числом", expressionAfter[:indexAfter])
 	}
 
 	// Создаем операцию
@@ -187,7 +199,7 @@ func ManageOrder(expression string) (string, error) {
 	// Выполнение операции. в случае ошибки возвращаем ее
 	result, err := oper.ParseOper()
 	if err != nil {
-		return expression, err
+		return expression, fmt.Errorf("Ошибка выполнения примера [%s]: %v", oper.FormatToString(), err)
 	}
 
 	// Заменяем выполненую операцию
@@ -196,11 +208,10 @@ func ManageOrder(expression string) (string, error) {
 	// Проверяем является ли результат числом
 	_, ok := strconv.ParseFloat(expression, 64)
 	if ok != nil {
-
 		// В случае если результат не число, то продолжаем операцию
 		expression, err = ManageOrder(expression)
 		if err != nil {
-			return expression, err
+			return expression, fmt.Errorf("Ошибка выполнения примера [%s]: %v", expression, err)
 		}
 	}
 
@@ -220,7 +231,7 @@ func BraketOf(expression string) (string, error) {
 
 		// В случчае отсутствия закрывающися скобок при наличии открых отправляем ошибку
 		if indexOpen != indexClose && indexClose == -1 {
-			return "", fmt.Errorf("400 Скобка должна быть закрыта")
+			return expression, fmt.Errorf("Скобка должна быть закрыта")
 		}
 
 		// В случае Последней открытой скобки
@@ -229,7 +240,7 @@ func BraketOf(expression string) (string, error) {
 			// Выполняем пример без скобок, в случае ошибки возвращаем ошибку
 			managedexeption, err := ManageOrder(expression[:indexClose])
 			if err != nil {
-				return "", err
+				return expression, fmt.Errorf("Ошибка выполнения примера [%s]: %v", expression, err)
 			}
 			// Заменяем выражение на исход примера и возвращаем оставшееся выражение
 			expression = strings.Replace(expression, expression[:indexClose+1], managedexeption, 1)
@@ -239,7 +250,7 @@ func BraketOf(expression string) (string, error) {
 		// С помощью рекурсии идем внутрь следуших скобок, в случае ошибки возвращаем ошибку
 		BreketOfEx, err := BraketOf(expression[indexOpen+1:])
 		if err != nil {
-			return expression, err
+			return expression, fmt.Errorf("Ошибка внутри выражения [%s]: %v", expression[indexOpen+1:], err)
 		}
 
 		// Заменяем строку на результат убиранее скобок и идем по циклу дальше
@@ -275,7 +286,7 @@ func Calc(expression string) (float64, error) {
 	// Выполняем операцию с оставшийся строкой без скобок. В случае ошибки возврщаем ошибку
 	expression, err = ManageOrder(expression)
 	if err != nil {
-		return float64(0), err
+		return float64(0), fmt.Errorf("Ошибка выполнения примера [%s]: %v", expression, err)
 	}
 
 	return strconv.ParseFloat(expression, 64)
