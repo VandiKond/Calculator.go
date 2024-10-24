@@ -9,7 +9,7 @@ import (
 // Все разрешенные операторы
 var operators = []string{"*", "+", "/", "-"}
 
-// Тип для операции
+// Структурадля операции
 type Operation struct {
 	// Первое число
 	num1 float64
@@ -20,7 +20,7 @@ type Operation struct {
 }
 
 // Метод для выполнения операции
-func (Op Operation) ParaseOper() (float64, error) {
+func (Op Operation) ParseOper() (float64, error) {
 	// Предваритеьно создаем конечное число
 	var num float64
 	// Проходимся по символам
@@ -38,13 +38,13 @@ func (Op Operation) ParaseOper() (float64, error) {
 	// В случае деления проверяем второе число на то, что оно 0. Если нет то возвращаем результат деления
 	case "/":
 		if Op.num2 == 0 {
-			return float64(0), fmt.Errorf("400 Делить на 0 нельзя!")
+			return 0, fmt.Errorf("400 Делить на 0 нельзя!")
 		}
 		num = Op.num1 / Op.num2
 		break
 	// В ином случае вызываем ошибку
 	default:
-		return float64(0), fmt.Errorf("400 Неизвестный знак : %s", Op.symvol)
+		return 0, fmt.Errorf("400 Неизвестный знак : %s", Op.symvol)
 	}
 	// Возвращаем результат
 	return num, nil
@@ -102,7 +102,7 @@ func OrderOperations(expression string) (string, error) {
 	oper := Operation{num1: num1, symvol: operator, num2: num2}
 
 	// Выполняем операцию. в случае ошибки возвращаем ее
-	result, err := oper.ParaseOper()
+	result, err := oper.ParseOper()
 	if err != nil {
 		return expression, err
 	}
@@ -185,7 +185,7 @@ func ManageOrder(expression string) (string, error) {
 	oper := Operation{num1: num1, symvol: operatType, num2: num2}
 
 	// Выполнение операции. в случае ошибки возвращаем ее
-	result, err := oper.ParaseOper()
+	result, err := oper.ParseOper()
 	if err != nil {
 		return expression, err
 	}
