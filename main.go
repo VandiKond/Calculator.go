@@ -126,7 +126,7 @@ func OrderOperations(expression string) (string, error) {
 		// В случае если результат не число, то продолжаем операцию
 		expression, err = OrderOperations(expression)
 		if err != nil {
-			return expression, fmt.Errorf("Ошибка обработки: [%s] не является числом", expression)
+			return expression, fmt.Errorf("Ошибка последовательной операции [%s]: %v", expression, err)
 		}
 	}
 
