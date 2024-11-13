@@ -1,9 +1,12 @@
-package main
+package calc_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/VandiKond/Calculator.go.git/pkg/calc"
+)
 
 func TestCalc(t *testing.T) {
-	// Тесты для корректных выражений
 	testCases := []struct {
 		expression string
 		expected   float64
@@ -31,11 +34,11 @@ func TestCalc(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.expression, func(t *testing.T) {
-			result, err := Calc(testCase.expression)
+			result, err := calc.Calc(testCase.expression)
 			if err != nil {
-				t.Errorf("Calc(%s) ошибка: %v", testCase.expression, err)
+				t.Errorf("Calc(%s) error: %v", testCase.expression, err)
 			} else if result != testCase.expected {
-				t.Errorf("Calc(%s) = %v, ждет %v", testCase.expression, result, testCase.expected)
+				t.Errorf("Calc(%s) = %v, want %v", testCase.expression, result, testCase.expected)
 			}
 		})
 	}
