@@ -2,29 +2,33 @@ package calc
 
 import "github.com/VandiKond/vanerrors"
 
-var ShowCauseOptions vanerrors.Options = vanerrors.Options{
+var DefaultOptions vanerrors.Options = vanerrors.Options{
 	ShowMessage: true,
 	ShowCause:   true,
 }
 
-var DefaultOptions vanerrors.Options = vanerrors.Options{
+var DefaultLoggerOPtions vanerrors.LoggerOptions = vanerrors.LoggerOptions{
 	ShowMessage: true,
-}
-
-func GetDefaultLogSetting() vanerrors.LoggerOptions {
-	options := vanerrors.DefaultLoggerOptions
-	options.DoLog = false
-	return options
+	ShowCause:   true,
 }
 
 // Error names
 const (
-	DBZ = "divide by zero not allowed"
-	US  = "unknown symbol"
-	NPE = "num parsing error"
-	EDO = "error doing operation"
-	COO = "error completing order operation"
-	ECE = "error completing the expression"
-	BSC = "bracket should be closed"
-	GRB = "error in getting rid of brackets"
+	ErrorDivideByZero             = "divide by zero not allowed"
+	ErrorUnknownOperator          = "unknown operator"
+	ErrorParsingNumber            = "number parsing error"
+	ErrorDoingOperation           = "error doing operation"
+	ErrorCompletingOrderOperation = "error completing order operation"
+	ErrorExpressionCompleting     = "error completing the expression"
+	ErrorBracketShouldBeClosed    = "bracket should be closed"
+	ErrorBracketOf                = "error getting rid of brackets"
+	ErrorBracketShouldBeOpened    = "bracket should be opened"
 )
+
+func DefaultCalcVanError(Name string, Message string, Cause error) vanerrors.VanError {
+	return vanerrors.New(vanerrors.ErrorData{
+		Name:    Name,
+		Message: Message,
+		Cause:   Cause,
+	}, DefaultOptions, DefaultLoggerOPtions)
+}

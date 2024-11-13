@@ -12,11 +12,11 @@ var operators = []string{"*", "+", "/", "-"}
 // Operation struct
 type Operation struct {
 	// Thirst number
-	num1 float64
+	Num1 float64
 	// Operation type (one of operations)
-	symbol string
+	Symbol string
 	// Second number
-	num2 float64
+	Num2 float64
 }
 
 // Method to do operation
@@ -24,23 +24,23 @@ func (Op Operation) ParseOpr() (float64, error) {
 	// Making the result num
 	var num float64
 	// Switching operation types
-	switch Op.symbol {
+	switch Op.Symbol {
 	// In case of *, +, - Returning the operation result
 	case "*":
-		num = Op.num1 * Op.num2
+		num = Op.Num1 * Op.Num2
 	case "+":
-		num = Op.num1 + Op.num2
+		num = Op.Num1 + Op.Num2
 	case "-":
-		num = Op.num1 - Op.num2
+		num = Op.Num1 - Op.Num2
 	// If it is dividing checking that the number is not zero 0. And making the operation
 	case "/":
-		if Op.num2 == 0 {
-			return 0, fmt.Errorf("dividing by zero is not allowed")
+		if Op.Num2 == 0 {
+			return 0, DefaultCalcVanError(ErrorDivideByZero, fmt.Sprintf("you can't divide by zero in operation '%s'", Op.FormatToString()), nil)
 		}
-		num = Op.num1 / Op.num2
+		num = Op.Num1 / Op.Num2
 	// Default returning an error
 	default:
-		return 0, fmt.Errorf("unknown symbol: [%s]", Op.symbol)
+		return 0, DefaultCalcVanError(ErrorUnknownOperator, fmt.Sprintf("the operator '%s' is not allowed in operation '%s'", Op.Symbol, Op.FormatToString()), nil)
 	}
 	// returning the result
 	return num, nil
@@ -48,7 +48,7 @@ func (Op Operation) ParseOpr() (float64, error) {
 
 // Method to create a string of the operation
 func (Op Operation) FormatToString() string {
-	return strconv.FormatFloat(Op.num1, 'f', -1, 64) + Op.symbol + strconv.FormatFloat(Op.num2, 'f', -1, 64)
+	return strconv.FormatFloat(Op.Num1, 'f', -1, 64) + Op.Symbol + strconv.FormatFloat(Op.Num2, 'f', -1, 64)
 }
 
 // Getting operator index by findType and getIndex
@@ -91,7 +91,7 @@ func OrderOperations(expression string) (string, error) {
 	// Tying to convert the result to a number
 	num1, err := strconv.ParseFloat(expression[:index], 64)
 	if err != nil {
-		return expression, fmt.Errorf("num parsing error: [%s] is not a number", expression[:index])
+		return expression, DefaultCalcVanError(ErrorParsingNumber, fmt.Sprintf("'%s' is not a number in expression '%s'", expression[:index], expression), err)
 	}
 
 	// Getting the index of the second operator
@@ -99,16 +99,16 @@ func OrderOperations(expression string) (string, error) {
 	indexOfEnd, _ := findIndex(expressionTilEnd, func(i1, i2 int) bool { return i1 < i2 }, len(expressionTilEnd), strings.Index)
 	num2, err := strconv.ParseFloat(expressionTilEnd[:indexOfEnd], 64)
 	if err != nil {
-		return expression, fmt.Errorf("num parsing error: [%s] is not a number", expressionTilEnd[:indexOfEnd])
+		return expression, DefaultCalcVanError(ErrorParsingNumber, fmt.Sprintf("'%s' is not a number in expression '%s'", expression[:indexOfEnd], expression), err)
 	}
 
 	// Creating the operation data
-	opr := Operation{num1: num1, symbol: operator, num2: num2}
+	opr := Operation{Num1: num1, Symbol: operator, Num2: num2}
 
 	// Doing the operation
 	result, err := opr.ParseOpr()
 	if err != nil {
-		return expression, fmt.Errorf("error doing operation [%s]: %w", opr.FormatToString(), err)
+		return expression, DefaultCalcVanError(ErrorDoingOperation, fmt.Sprintf("could not do operation '%s' in expression '%s'", opr.FormatToString(), expression), err)
 	}
 	// Replacing the operation with the result
 	expression = strings.Replace(expression, opr.FormatToString(), strconv.FormatFloat(result, 'f', -1, 64), 1)
@@ -119,7 +119,7 @@ func OrderOperations(expression string) (string, error) {
 		// Continue the order oration
 		expression, err = OrderOperations(expression)
 		if err != nil {
-			return expression, fmt.Errorf("error completing order operation [%s]: %w", expression, err)
+			return expression, DefaultCalcVanError(ErrorCompletingOrderOperation, fmt.Sprintf("could not do order operation of expression '%s'", expression), err)
 		}
 	}
 
@@ -150,7 +150,7 @@ func ManageOrder(expression string) (string, error) {
 	if indexDiv == indexMul {
 		expression, err := OrderOperations(expression)
 		if err != nil {
-			return expression, fmt.Errorf("error completing order operation [%s]: %w", expression, err)
+			return expression, DefaultCalcVanError(ErrorCompletingOrderOperation, fmt.Sprintf("could not do order operation of expression '%s'", expression), err)
 		}
 		return expression, nil
 	}
@@ -180,19 +180,19 @@ func ManageOrder(expression string) (string, error) {
 	num1, err1 := strconv.ParseFloat(expressionBe4[indexBe4+1:], 64)
 	num2, err2 := strconv.ParseFloat(expressionAfter[:indexAfter], 64)
 	if err1 != nil {
-		return expression, fmt.Errorf("num parsing error: [%s] is not a number", expressionBe4[indexBe4+1:])
+		return expression, DefaultCalcVanError(ErrorParsingNumber, fmt.Sprintf("'%s' is not a number in expression '%s'", expression[:indexBe4+1], expression), err)
 	}
 	if err2 != nil {
-		return expression, fmt.Errorf("num parsing error: [%s] is not a number", expressionAfter[:indexAfter])
+		return expression, DefaultCalcVanError(ErrorParsingNumber, fmt.Sprintf("'%s' is not a number in expression '%s'", expression[:indexAfter], expression), err)
 	}
 
 	// Creating the operation
-	opr := Operation{num1: num1, symbol: oprType, num2: num2}
+	opr := Operation{Num1: num1, Symbol: oprType, Num2: num2}
 
 	// Doing the operation
 	result, err := opr.ParseOpr()
 	if err != nil {
-		return expression, fmt.Errorf("error doing operation [%s]: %w", opr.FormatToString(), err)
+		return expression, DefaultCalcVanError(ErrorDoingOperation, fmt.Sprintf("could not do operation '%s' in expression '%s'", opr.FormatToString(), expression), err)
 	}
 
 	// Replacing the operation result
@@ -204,7 +204,7 @@ func ManageOrder(expression string) (string, error) {
 		// Continuing the operation
 		expression, err = ManageOrder(expression)
 		if err != nil {
-			return expression, fmt.Errorf("error completing the expression [%s]: %w", expression, err)
+			return expression, DefaultCalcVanError(ErrorExpressionCompleting, fmt.Sprintf("could not complete expression '%s'", expression), err)
 		}
 	}
 
@@ -213,43 +213,42 @@ func ManageOrder(expression string) (string, error) {
 
 // Gets rid of brackets
 func BracketOf(expression string) (string, error) {
+	for {
+		// Getting the index of the closing bracket
+		indexClose := strings.Index(expression, ")")
 
-	// Find first brackets
-	indexOpen := strings.Index(expression, "(")
-	indexClose := strings.Index(expression, ")")
-
-	for indexClose > indexOpen || indexOpen != -1 {
-
-		// If close bracket not exists
-		if indexOpen != indexClose && indexClose == -1 {
-			return expression, fmt.Errorf("bracket should be closed")
-		}
-
-		if indexClose < indexOpen || indexOpen == -1 {
-			// Doing the operation without brackets
-			managedExpression, err := ManageOrder(expression[:indexClose])
-			if err != nil {
-				return expression, fmt.Errorf("error completing the expression [%s]: %w", expression, err)
+		// Checking non bracket variant
+		if indexClose == -1 {
+			countOpen := strings.Count(expression, "(")
+			if countOpen > 0 {
+				return expression, DefaultCalcVanError(ErrorBracketShouldBeClosed, fmt.Sprintf("not closed bracket in expression '%s'", expression), nil)
 			}
-			// Replacing the result
-			expression = strings.Replace(expression, expression[:indexClose+1], managedExpression, 1)
+
 			return expression, nil
 		}
 
-		// Going into the next bracket
-		BracketOfEx, err := BracketOf(expression[indexOpen+1:])
-		if err != nil {
-			return expression, fmt.Errorf("error in getting rid of brackets [%s]: %w", expression[indexOpen+1:], err)
+		// Creating a sub expression before the closing bracket
+		subExpression := expression[:indexClose]
+
+		// Getting the last index of opening bracket in the sub expression
+		indexOpen := strings.LastIndex(subExpression, "(")
+
+		if indexOpen == -1 {
+			return expression, DefaultCalcVanError(ErrorBracketShouldBeOpened, fmt.Sprintf("not opened bracket in expression '%s'", subExpression), nil)
 		}
 
-		// Replacing the sting
-		expression = strings.Replace(expression, expression[indexOpen:], BracketOfEx, 1)
-		indexOpen = strings.Index(expression, "(")
-		indexClose = strings.Index(expression, ")")
+		// Creating the expression between two brackets
+		subExpression = subExpression[indexOpen+1:]
+
+		// Doing the operation
+		subExpression, err := ManageOrder(subExpression)
+		if err != nil {
+			return expression, DefaultCalcVanError(ErrorExpressionCompleting, fmt.Sprintf("could not complete expression '%s'", subExpression), err)
+		}
+
+		// Replacing the result
+		expression = strings.Replace(expression, expression[indexOpen:indexClose+1], subExpression, 1)
 	}
-
-	return expression, nil
-
 }
 
 // Calculator
@@ -267,14 +266,14 @@ func Calc(expression string) (float64, error) {
 		// Getting rid of brackets
 		expression, err = BracketOf(expression)
 		if err != nil {
-			return float64(0), fmt.Errorf("error in getting rid of brackets [%s]: %w", expression, err)
+			return float64(0), DefaultCalcVanError(ErrorBracketOf, fmt.Sprintf("error getting rid of brackets in expression '%s'", expression), err)
 		}
 	}
 
 	// Managing the operation without the brackets
 	expression, err = ManageOrder(expression)
 	if err != nil {
-		return float64(0), fmt.Errorf("error completing the expression [%s]: %w", expression, err)
+		return float64(0), DefaultCalcVanError(ErrorExpressionCompleting, fmt.Sprintf("could not completing of expression '%s'", expression), err)
 	}
 
 	return strconv.ParseFloat(expression, 64)

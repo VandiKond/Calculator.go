@@ -30,6 +30,8 @@ func TestCalc(t *testing.T) {
 		{"5+ -5 + 7 - -6", 13},
 		{"-(5+5)", -10},
 		{"-90+90", 0},
+		{"9*-1", -9},
+		{"10*(10/10*-10)", -100},
 	}
 
 	for _, testCase := range testCases {
@@ -39,6 +41,25 @@ func TestCalc(t *testing.T) {
 				t.Errorf("Calc(%s) error: %v", testCase.expression, err)
 			} else if result != testCase.expected {
 				t.Errorf("Calc(%s) = %v, want %v", testCase.expression, result, testCase.expected)
+			}
+		})
+	}
+}
+
+func TestCalcErrors(t *testing.T) {
+	testCases := []string{
+		"10/0",
+		"2*(10+9",
+		"not numbs",
+		"2r+10b",
+		"10*(10+2*(10+2*(3+4) + 3 * (1+3) + 8 )",
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase, func(t *testing.T) {
+			_, err := calc.Calc(testCase)
+			if err == nil {
+				t.Errorf("Calc(%s) error is not nil", testCase)
 			}
 		})
 	}
