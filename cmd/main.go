@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"time"
 
-	"github.com/VandiKond/Calculator.go.git/pkg/calc"
+	"github.com/VandiKond/Calculator.go.git/internal/application"
 )
 
 func main() {
-	fmt.Println(calc.Calc("(1+1)*2"))
+	app := application.New(time.Second * 10)
+	app.Run()
 }
