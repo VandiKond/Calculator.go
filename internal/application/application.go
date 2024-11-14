@@ -22,7 +22,7 @@ func (a *Application) Run() error {
 	go a.ExitTimeOut()
 
 	// The program
-
+	log.Println("the program is working")
 	// The program end
 
 	// Returning without error
