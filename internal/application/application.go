@@ -21,6 +21,7 @@ func (a *Application) Run() error {
 	go a.ExitTimeOut()
 
 	// Returning without error
+	log.Printf("application stopped before timeout")
 	return nil
 }
 
