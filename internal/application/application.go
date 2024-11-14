@@ -18,10 +18,14 @@ func New(d time.Duration) *Application {
 
 func (a *Application) Run() error {
 	// Exiting in duration
+	defer log.Printf("application stopped before timeout")
 	go a.ExitTimeOut()
 
+	// The program
+
+	// The program end
+
 	// Returning without error
-	log.Printf("application stopped before timeout")
 	return nil
 }
 
