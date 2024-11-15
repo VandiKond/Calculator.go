@@ -7,7 +7,12 @@ import (
 )
 
 type Application struct {
-	Duration time.Duration
+	Duration  time.Duration
+	IsService bool
+}
+
+func NewService() *Application {
+	return &Application{}
 }
 
 func New(d time.Duration) *Application {
@@ -30,6 +35,9 @@ func (a *Application) Run() error {
 }
 
 func (a *Application) ExitTimeOut() {
+	if a.IsService {
+		return
+	}
 	time.Sleep(a.Duration)
 	log.Printf("timeout %s has passed. Ending the program", a.Duration)
 	os.Exit(418)
