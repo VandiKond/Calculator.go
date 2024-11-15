@@ -1,6 +1,7 @@
 package application
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -28,6 +29,7 @@ func (a *Application) Run() error {
 
 	// The program
 	log.Println("the program is working")
+	CloseBy()
 	// The program end
 
 	// Returning without error
@@ -35,10 +37,16 @@ func (a *Application) Run() error {
 }
 
 func (a *Application) ExitTimeOut() {
+	// Checking service mod
 	if a.IsService {
 		return
 	}
+
+	// Waiting duration seconds
 	time.Sleep(a.Duration)
+
+	// Exiting after timeout
+	fmt.Println("")
 	log.Printf("timeout %s has passed. Ending the program", a.Duration)
 	os.Exit(418)
 }
