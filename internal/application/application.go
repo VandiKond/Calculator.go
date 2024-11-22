@@ -13,7 +13,9 @@ type Application struct {
 }
 
 func NewService() *Application {
-	return &Application{}
+	return &Application{
+		IsService: true,
+	}
 }
 
 func New(d time.Duration) *Application {
