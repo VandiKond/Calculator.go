@@ -1,2 +1,4 @@
 github.com/VandiKond/vanerrors v0.1.1 h1:yAwPWOYH/5s2Vylz7pA96nKkuBe6dN1CLkO7epwrc4g=
 github.com/VandiKond/vanerrors v0.1.1/go.mod h1:2l9cM0Z819aAhtL1Wy9ctxjzMZ29t1yMYbhFewoJHOs=
+github.com/VandiKond/vanerrors v0.3.0 h1:TBl6oo9V1EcB8+krbF02of3yRPZMmskITBUsbJr713s=
+github.com/VandiKond/vanerrors v0.3.0/go.mod h1:2l9cM0Z819aAhtL1Wy9ctxjzMZ29t1yMYbhFewoJHOs=

@@ -7,7 +7,7 @@ var DefaultOptions vanerrors.Options = vanerrors.Options{
 	ShowCause:   true,
 }
 
-var DefaultLoggerOPtions vanerrors.LoggerOptions = vanerrors.LoggerOptions{
+var DefaultLoggerOptions vanerrors.LoggerOptions = vanerrors.LoggerOptions{
 	ShowMessage: true,
 	ShowCause:   true,
 }
@@ -26,9 +26,9 @@ const (
 )
 
 func DefaultCalcVanError(Name string, Message string, Cause error) vanerrors.VanError {
-	return vanerrors.New(vanerrors.ErrorData{
-		Name:    Name,
-		Message: Message,
-		Cause:   Cause,
-	}, DefaultOptions, DefaultLoggerOPtions)
+	err := errorW.NewWrap(Name, Cause, nil)
+	err.Message = Message
+	return err
 }
+
+var errorW = vanerrors.NewW(DefaultOptions, DefaultLoggerOptions)
